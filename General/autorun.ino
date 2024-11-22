@@ -13,7 +13,11 @@ Gamecube_Data_t d = defaultGamecubeData;   //Structure for data to be sent to co
 //This is needed but you don't need a controller on pin 7
 CGamecubeController GamecubeController1(7);
 
-static unsigned long frameDuration = 1000 / 30; // A "frame" in this case will be 30FPS as the arduino isn't precise enough to do 60FPS
+static unsigned long frameDuration = 1000 / 30;
+
+//Amount of "frames" to run before switching directions. Because GBI and Colo/XD run at different frame rates, this number needs to be adjusted accordingly.
+//For GBA, a good amount is 20, while for Colo/XD a good amount is 4.
+static int frameInterval = 22;
  
 void setup()
 {
@@ -55,12 +59,12 @@ void loop() {
     lastChange = currentMillis;
     frameCounter++;
 
-    if (frameCounter >= 4) {
+    if (frameCounter >= frameInterval) {
       d.report.b = !d.report.b;
       d.report.xAxis = 0;
     }
 
-    if (frameCounter >= 8) {
+    if (frameCounter >= (frameInterval * 2)) {
       d.report.b = !d.report.b;
       d.report.xAxis = 255;
       frameCounter = 0;
